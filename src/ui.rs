@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::{GameState, CurrentLevel, CurrentWorld, WORLDS, WorldTheme};
 
 #[derive(Component)]
 pub struct MovesText;
@@ -6,12 +7,19 @@ pub struct MovesText;
 #[derive(Component)]
 pub struct LevelText;
 
+#[derive(Component)]
+pub struct WorldText;
+
+#[derive(Component)]
+pub struct StarsText;
+
 pub fn setup_ui(commands: &mut Commands) {
+    // Moves remaining
     commands.spawn((
         TextBundle::from_section(
             "Moves: 0",
             TextStyle {
-                font_size: 24.0,
+                font_size: 20.0,
                 color: Color::WHITE,
                 ..default()
             },
@@ -25,11 +33,12 @@ pub fn setup_ui(commands: &mut Commands) {
         MovesText,
     ));
 
+    // Current level
     commands.spawn((
         TextBundle::from_section(
-            "Level: 1",
+            "Level: 1-1",
             TextStyle {
-                font_size: 24.0,
+                font_size: 20.0,
                 color: Color::WHITE,
                 ..default()
             },
@@ -42,23 +51,74 @@ pub fn setup_ui(commands: &mut Commands) {
         }),
         LevelText,
     ));
+
+    // World name
+    commands.spawn((
+        TextBundle::from_section(
+            "World: Forest",
+            TextStyle {
+                font_size: 20.0,
+                color: Color::WHITE,
+                ..default()
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: Val::Px(40.0),
+            left: Val::Px(10.0),
+            ..default()
+        }),
+        WorldText,
+    ));
+
+    // Stars collected
+    commands.spawn((
+        TextBundle::from_section(
+            "Stars: 0/0",
+            TextStyle {
+                font_size: 20.0,
+                color: Color::YELLOW,
+                ..default()
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: Val::Px(40.0),
+            right: Val::Px(10.0),
+            ..default()
+        }),
+        StarsText,
+    ));
 }
 
 pub fn update_ui_system(
-    mut queries: QuerySet<(
-        Query<&mut Text, With<MovesText>>,
-        Query<&mut Text, With<LevelText>>,
-    )>,
+    mut moves_query: Query<&mut Text, With<MovesText>>,
+    mut level_query: Query<&mut Text, With<LevelText>>,
+    mut world_query: Query<&mut Text, With<WorldText>>,
+    mut stars_query: Query<&mut Text, With<StarsText>>,
     game_state: Res<GameState>,
     level: Res<CurrentLevel>,
+    world: Res<CurrentWorld>,
+    collected_stars: Res<CollectedStars>,
 ) {
-    let Ok(q) = queries.get_single() else { return };
-    let Ok(mut moves_text) = q.0.get_single_mut() else { return };
-    let Ok(mut level_text) = q.1.get_single_mut() else { return };
+    if let Ok(mut moves_text) = moves_query.get_single_mut() {
+        moves_text.sections[0].value = format!("Moves: {}", game_state.moves_remaining);
+    }
 
-    moves_text.sections[0].value = format!("Moves: {}", game_state.moves_remaining);
-    level_text.sections[0].value = format!("Level: {}", level.index + 1);
+    if let Ok(mut level_text) = level_query.get_single_mut() {
+        level_text.sections[0].value = format!("Level: {}-{}", world.index + 1, level.index + 1);
+    }
+
+    if let Ok(mut world_text) = world_query.get_single_mut() {
+        world_text.sections[0].value = format!("World: {}", WORLDS[world.index].name);
+    }
+
+    if let Ok(mut stars_text) = stars_query.get_single_mut() {
+        let collected = collected_stars.stars.iter().filter(|&&collected| collected).count();
+        stars_text.sections[0].value = format!("Stars: {}/{}", collected, level.data.stars.len());
+    }
 }
 
-// Import GameState and CurrentLevel from main module
-use crate::{GameState, CurrentLevel};
+// Import types
+use crate::pudding::Pudding;
+use crate::CollectedStars;
