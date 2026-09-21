@@ -1,0 +1,21 @@
+[package]
+name = "pudding_monster"
+version = "0.1.0"
+edition = "2021"
+authors = ["Florent Droyer"]
+description = "A Rust clone of Pudding Monsters game with additional levels"
+license = "MIT"
+
+[dependencies]
+bevy = { version = "0.12", features = ["default_fonts"] }
+bevy_ecs_tilemap = "0.12"
+rand = "0.8"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package.*]
+opt-level = 3
+
+[workspace]
+resolver = "2"
