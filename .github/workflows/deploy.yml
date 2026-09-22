@@ -34,6 +34,9 @@ jobs:
         run: pnpm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          # Active Pages sur le dépôt si ce n'est pas déjà fait (nécessite pages: write)
+          enablement: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
