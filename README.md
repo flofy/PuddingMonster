@@ -7,10 +7,10 @@ Clone du jeu Pudding Monsters.
 
 ## React
 
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 
-Build : npm run build
+Build : pnpm run build
 
 ## Rust
 

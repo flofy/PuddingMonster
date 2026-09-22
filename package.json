@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Pudding Monsters game in React",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.15.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
